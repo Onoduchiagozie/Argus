@@ -14,12 +14,12 @@ namespace MyStudentApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LectureresController : ControllerBase
+    public class CreateLecturesController : ControllerBase
     {
         private readonly TendancyDbContext _context;
         private readonly IMapper _mapper;
 
-        public LectureresController(TendancyDbContext context,IMapper mapper)
+        public CreateLecturesController(TendancyDbContext context,IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -86,14 +86,13 @@ namespace MyStudentApi.Controllers
         
 /*        COMPLETED
 */        [HttpPost]
-        public async Task<ActionResult<SchoolClassDTO>> PostSchoolClass(SchoolClassDTO schoolClass)
+        public async Task<ActionResult<SchoolClass>> PostSchoolClass(SchoolClass schoolClass)
         {
           if (_context.SchoolClasses == null)
                 return Problem("Entity set 'SchoolClasses' is null.");
 
-            SchoolClass lecture = _mapper.Map<SchoolClass>(schoolClass);
-           
-            _context.SchoolClasses.Add(lecture);
+            
+            _context.SchoolClasses.Add(schoolClass);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetSchoolClass", new { id = schoolClass.Id }, schoolClass);

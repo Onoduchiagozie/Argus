@@ -14,17 +14,23 @@ namespace MyStudentApi.Data
         public DbSet<SchoolClass> SchoolClasses { get; set; }
         public DbSet<AttendanceViewModel> AttendanceViewModel { get; set; }
 
-
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<Student>()
-              .HasOne(s => s.SchoolClass)
-              .WithMany(sc => sc.Students)
-              .HasForeignKey(s => s.SchoolClassId)
-              .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<AttendanceViewModel>()
+                .Property(s => s.SchoolClassId)
+                .IsRequired(false); // This makes the SchoolClassId nullable in the database
         }
+
+
+        /* protected override void OnModelCreating(ModelBuilder modelBuilder)
+         {
+             base.OnModelCreating(modelBuilder);
+
+             modelBuilder.Entity<Student>()
+               .HasOne(s => s.SchoolClass)
+               .WithMany(sc => sc.Students)
+               .HasForeignKey(s => s.SchoolClassId)
+               .OnDelete(DeleteBehavior.NoAction);
+         }*/
     }
 }

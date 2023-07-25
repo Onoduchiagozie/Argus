@@ -6,11 +6,8 @@ namespace MyStudentApi.Models
     {
         public int Id { get; set; }
         public string? RegNo { get; set; }   
-        public string? Name { get; set; }
-        public int? SchoolClassId { get; set; }
-        
-        public SchoolClass? SchoolClass { get; set; }
-        public bool IsRegistered { get; set; }
+        public string? FullName { get; set; }
+ 
         
     }
 }

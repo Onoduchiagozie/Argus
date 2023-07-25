@@ -12,8 +12,8 @@ using MyStudentApi.Data;
 namespace MyStudentApi.Migrations
 {
     [DbContext(typeof(TendancyDbContext))]
-    [Migration("20230721150830_fix5")]
-    partial class fix5
+    [Migration("20230725045536_SubmitFUNC")]
+    partial class SubmitFUNC
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,6 +35,9 @@ namespace MyStudentApi.Migrations
 
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRegistered")
+                        .HasColumnType("bit");
 
                     b.Property<int>("SchoolClassId")
                         .HasColumnType("int");
@@ -90,21 +93,13 @@ namespace MyStudentApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("IsRegistered")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
+                    b.Property<string>("FullName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RegNo")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("SchoolClassId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("SchoolClassId");
 
                     b.ToTable("Students");
                 });
@@ -126,21 +121,6 @@ namespace MyStudentApi.Migrations
                     b.Navigation("SchoolClass");
 
                     b.Navigation("Student");
-                });
-
-            modelBuilder.Entity("MyStudentApi.Models.Student", b =>
-                {
-                    b.HasOne("MyStudentApi.Models.SchoolClass", "SchoolClass")
-                        .WithMany("Students")
-                        .HasForeignKey("SchoolClassId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("SchoolClass");
-                });
-
-            modelBuilder.Entity("MyStudentApi.Models.SchoolClass", b =>
-                {
-                    b.Navigation("Students");
                 });
 #pragma warning restore 612, 618
         }

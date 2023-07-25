@@ -5,7 +5,7 @@
 namespace MyStudentApi.Migrations
 {
     /// <inheritdoc />
-    public partial class fk_fix4 : Migration
+    public partial class SubmitFUNC2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

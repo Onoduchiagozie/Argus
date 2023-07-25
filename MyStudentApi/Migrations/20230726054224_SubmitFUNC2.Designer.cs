@@ -12,8 +12,8 @@ using MyStudentApi.Data;
 namespace MyStudentApi.Migrations
 {
     [DbContext(typeof(TendancyDbContext))]
-    [Migration("20230719192939_FK_FIXING3")]
-    partial class FK_FIXING3
+    [Migration("20230726054224_SubmitFUNC2")]
+    partial class SubmitFUNC2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,7 +36,11 @@ namespace MyStudentApi.Migrations
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("SchoolClassId")
+                    b.Property<bool>("IsRegistered")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("SchoolClassId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<int>("StudentId")
@@ -90,21 +94,13 @@ namespace MyStudentApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("IsRegistered")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
+                    b.Property<string>("FullName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RegNo")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("SchoolClassId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("SchoolClassId");
 
                     b.ToTable("Students");
                 });
@@ -126,15 +122,6 @@ namespace MyStudentApi.Migrations
                     b.Navigation("SchoolClass");
 
                     b.Navigation("Student");
-                });
-
-            modelBuilder.Entity("MyStudentApi.Models.Student", b =>
-                {
-                    b.HasOne("MyStudentApi.Models.SchoolClass", "SchoolClass")
-                        .WithMany()
-                        .HasForeignKey("SchoolClassId");
-
-                    b.Navigation("SchoolClass");
                 });
 #pragma warning restore 612, 618
         }

@@ -87,28 +87,27 @@ namespace MyStudentApi.Controllers
  
 /*        COMPLETED
 */        [HttpPost]
-        public async Task<ActionResult<StudentsDTO>> PostStudent(StudentsDTO student)
+        public async Task<ActionResult<Student>> PostStudent(Student student)
         {
-            var today = DateTime.Now;
+            /*var today = DateTime.Now;
             var currentLecture = _context.SchoolClasses.FirstOrDefault(lecture =>
                                                                             (lecture.DayOfWeek == today.DayOfWeek) && 
                                                                             (lecture.StartTime.TimeOfDay <= today.TimeOfDay
                                                                              &&
                                                                              lecture.StopTime.TimeOfDay >= today.TimeOfDay));
-            Student student1 = _mapper.Map<Student>(student);
+            Student student1 = _mapper.Map<Student>(student);*/
 
-            if (currentLecture != null)
-            {
-                student1.SchoolClass = (SchoolClass?)currentLecture;
-                student1.IsRegistered = true;
-                _context.Students.Add(student1);
+           
+/*                student1.SchoolClass = (SchoolClass?)currentLecture;
+*//*                student1.IsRegistered = true;
+*/                _context.Students.Add(student);
                 Console.WriteLine("Successfully Saved Student Object.......................................");
-            }
+       /*     }
             else
             {
                 student1.IsRegistered = false;
                 _context.Students.Add(student1);
-            }
+            }*/
             await _context.SaveChangesAsync();
             return CreatedAtAction("GetStudent", new { id = student.Id }, student);
         }
