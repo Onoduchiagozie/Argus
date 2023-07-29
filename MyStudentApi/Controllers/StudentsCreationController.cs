@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyStudentApi.Data;
 using MyStudentApi.Models;
 using MyStudentApi.Models.DTO;
-using MyStudentApi.Repository.IRepo;
+using NuGet.Packaging;
+using System.Linq;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace MyStudentApi.Controllers
 {
@@ -18,34 +16,34 @@ namespace MyStudentApi.Controllers
     public class StudentsCreationController : ControllerBase
     {
         private readonly TendancyDbContext _context;
-      
+
         private readonly IMapper _mapper;
 
         public StudentsCreationController(TendancyDbContext context, IMapper mapper)
         {
             _context = context;
-            _mapper = mapper; 
+            _mapper = mapper;
         }
 
         // GET: api/StudentsCreation
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Student>>> GetStudents()
         {
-          if (_context.Students == null)
-          {
-              return NotFound();
-          }
+            if (_context.Students == null)
+            {
+                return NotFound();
+            }
             return await _context.Students.ToListAsync();
         }
 
-     
+
         [HttpGet("{id}")]
         public async Task<ActionResult<Student>> GetStudent(int id)
         {
-          if (_context.Students == null)
-          {
-              return NotFound();
-          }
+            if (_context.Students == null)
+            {
+                return NotFound();
+            }
             var student = await _context.Students.FindAsync(id);
 
             if (student == null)
@@ -84,35 +82,35 @@ namespace MyStudentApi.Controllers
 
             return NoContent();
         }
- 
-/*        COMPLETED
-*/        [HttpPost]
-        public async Task<ActionResult<Student>> PostStudent(Student student)
-        {
-            /*var today = DateTime.Now;
-            var currentLecture = _context.SchoolClasses.FirstOrDefault(lecture =>
-                                                                            (lecture.DayOfWeek == today.DayOfWeek) && 
-                                                                            (lecture.StartTime.TimeOfDay <= today.TimeOfDay
-                                                                             &&
-                                                                             lecture.StopTime.TimeOfDay >= today.TimeOfDay));
-            Student student1 = _mapper.Map<Student>(student);*/
 
-           
-/*                student1.SchoolClass = (SchoolClass?)currentLecture;
-*//*                student1.IsRegistered = true;
-*/                _context.Students.Add(student);
-                Console.WriteLine("Successfully Saved Student Object.......................................");
-       /*     }
-            else
+        /*        COMPLETED
+        */
+
+
+        [HttpPost]
+        public IActionResult PostStudents(StudentsDTO studentDTO)
+        {
+            var student = _mapper.Map<Student>(studentDTO);
+  
+            // Retrieve the classes with the given classIds from the database
+       
+
+            var classesToAdd = _context.SchoolClasses
+                    .Where(c => student.CourseCodes.Contains(c.CourseCode))
+                    .ToList();
+            if(classesToAdd.Count > 0)
             {
-                student1.IsRegistered = false;
-                _context.Students.Add(student1);
-            }*/
-            await _context.SaveChangesAsync();
-            return CreatedAtAction("GetStudent", new { id = student.Id }, student);
+                var copyOfClassesToAdd = new List<SchoolClass>(classesToAdd);
+                student.SchoolClasses.AddRange(copyOfClassesToAdd);
+            }
+        
+            _context.Students.Add(student);          
+
+            _context.SaveChanges();
+            return Ok();
         }
 
-      
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStudent(int id)
         {

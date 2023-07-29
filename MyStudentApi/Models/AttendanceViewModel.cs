@@ -7,13 +7,16 @@ namespace MyStudentApi.Models
     public class AttendanceViewModel
     {
         public int Id { get; set; }
-        [AllowNull]
+         
         public int? SchoolClassId { get; set;}
         [ForeignKey("SchoolClassId")]
         public SchoolClass SchoolClass { get; set; }
         public int StudentId { get; set; }
         [ForeignKey("StudentId")]
         public Student Student { get; set; }    
+        public string? Course { get; set; }
+        public DateTime? StopTime { get; set; }
+        public DateTime? StartTime { get; set; }
         public DateTime DateTime { get; set; } = DateTime.Now;
         public bool IsRegistered { get; set; }
     }

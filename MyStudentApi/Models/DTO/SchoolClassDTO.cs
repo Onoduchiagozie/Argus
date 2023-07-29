@@ -11,10 +11,13 @@ namespace MyStudentApi.Models.DTO
         public DateTime StopTime { get; set; }
         public int UnitLoad { get; set; }
         public DayOfWeek? DayOfWeek { get; set; }
-
-
-        /*  public DateTime? Period { get; set; } = default(DateTime?);
-  public TimeOnly? TimeOnly { get; set; }*/
+        public List<int> CourseCodes { get; set; }
 
     }
 }
+
+
+    /*  public DateTime? Period { get; set; } = default(DateTime?);
+public TimeOnly? TimeOnly { get; set; }*/
+
+

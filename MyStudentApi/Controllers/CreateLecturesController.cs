@@ -86,13 +86,13 @@ namespace MyStudentApi.Controllers
         
 /*        COMPLETED
 */        [HttpPost]
-        public async Task<ActionResult<SchoolClass>> PostSchoolClass(SchoolClass schoolClass)
+        public async Task<ActionResult<SchoolClassDTO>> PostSchoolClass(SchoolClassDTO schoolClass)
         {
           if (_context.SchoolClasses == null)
                 return Problem("Entity set 'SchoolClasses' is null.");
-
+          var realSchoolClass=_mapper.Map<SchoolClass>(schoolClass);
             
-            _context.SchoolClasses.Add(schoolClass);
+            _context.SchoolClasses.Add(realSchoolClass);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetSchoolClass", new { id = schoolClass.Id }, schoolClass);

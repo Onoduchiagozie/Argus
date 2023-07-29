@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using MyStudentApi.Models;
 using System.Diagnostics;
 
@@ -13,24 +14,31 @@ namespace MyStudentApi.Data
         public DbSet<Student> Students { get; set; }
         public DbSet<SchoolClass> SchoolClasses { get; set; }
         public DbSet<AttendanceViewModel> AttendanceViewModel { get; set; }
-
+        public DbSet<StudentSchoolClass> StudentSchoolClass { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<AttendanceViewModel>()
-                .Property(s => s.SchoolClassId)
-                .IsRequired(false); // This makes the SchoolClassId nullable in the database
+            modelBuilder.Entity<Student>()
+         .HasMany(s => s.SchoolClasses)
+         .WithMany(c => c.Students)
+         .UsingEntity<StudentSchoolClass>(
+             j => j.HasOne(ssc => ssc.SchoolClass).WithMany(),
+             j => j.HasOne(ssc => ssc.Student).WithMany(),
+              j => j.ToTable("StudentSchoolClass")
+         );
+
+            
+
+
+            /* protected override void OnModelCreating(ModelBuilder modelBuilder)
+             {
+                 base.OnModelCreating(modelBuilder);
+
+                 modelBuilder.Entity<Student>()
+                   .HasOne(s => s.SchoolClass)
+                   .WithMany(sc => sc.Students)
+                   .HasForeignKey(s => s.SchoolClassId)
+                   .OnDelete(DeleteBehavior.NoAction);
+             }*/
         }
-
-
-        /* protected override void OnModelCreating(ModelBuilder modelBuilder)
-         {
-             base.OnModelCreating(modelBuilder);
-
-             modelBuilder.Entity<Student>()
-               .HasOne(s => s.SchoolClass)
-               .WithMany(sc => sc.Students)
-               .HasForeignKey(s => s.SchoolClassId)
-               .OnDelete(DeleteBehavior.NoAction);
-         }*/
     }
 }
