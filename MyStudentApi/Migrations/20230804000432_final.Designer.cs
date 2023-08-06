@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyStudentApi.Data;
 
@@ -11,9 +12,11 @@ using MyStudentApi.Data;
 namespace MyStudentApi.Migrations
 {
     [DbContext(typeof(TendancyDbContext))]
-    partial class TendancyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230804000432_final")]
+    partial class final
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

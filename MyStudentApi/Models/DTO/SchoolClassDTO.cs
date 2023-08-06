@@ -9,10 +9,11 @@ namespace MyStudentApi.Models.DTO
         public string? TeacherName { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime StopTime { get; set; }
+        public int CourseCode { get; set; }
         public int UnitLoad { get; set; }
         public DayOfWeek? DayOfWeek { get; set; }
-        public List<int> CourseCodes { get; set; }
-
+/*        public List<int> CourseCodes { get; set; }
+*/
     }
 }
 

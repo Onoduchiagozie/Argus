@@ -121,9 +121,9 @@ namespace MyStudentApi.Controllers
             var currentLecture = _context.SchoolClasses.FirstOrDefault(lecture =>
                                                                             (lecture.DayOfWeek == today.DayOfWeek) 
                                                                              &&
-                                                                            (lecture.StartTime.TimeOfDay <= today.TimeOfDay
+                                                                            (lecture.StartTime.TimeOfDay.Hours <= today.TimeOfDay.Hours
                                                                              &&
-                                                                             lecture.StopTime.TimeOfDay >= today.TimeOfDay));
+                                                                             lecture.StopTime.TimeOfDay.Hours >= today.TimeOfDay.Hours));
 
             var tendate = new AttendanceViewModel
             {
@@ -143,12 +143,14 @@ namespace MyStudentApi.Controllers
                 tendate.SchoolClassId= null;
                 tendate.IsRegistered = false;
             }
+            _context.AttendanceViewModel.Add(tendate);
+            await _context.SaveChangesAsync();
 
             if (currentLecture != null)
             {
                 DateTime fiveMinutesBeforeEndTime = currentLecture.StopTime.AddMinutes(-5);
 
-                if (today >= fiveMinutesBeforeEndTime)
+                if (true) //today >= fiveMinutesBeforeEndTime)
                 {
  
 
@@ -171,8 +173,12 @@ namespace MyStudentApi.Controllers
                     // Now you have the list of students who are registered but are absent for the current lecture
                     foreach (var x in studentsAbsentToday)
                     {
+             
                         Console.WriteLine($"{x.FullName} is absent for the current lecture.");
-                    }
+
+                        EmailSender.Sender(x,currentLecture);
+                        
+                     }
 
                 }
                 else
@@ -187,8 +193,9 @@ namespace MyStudentApi.Controllers
             // Check if the current lecture exists
  
 
-            _context.AttendanceViewModel.Add(tendate);
-            await _context.SaveChangesAsync();
+          
+
+
 
 
             var options = new JsonSerializerOptions
