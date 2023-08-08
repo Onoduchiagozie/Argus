@@ -27,19 +27,20 @@ namespace MyStudentApi.Data
                 {
                     Port = 587,
                     DeliveryMethod = SmtpDeliveryMethod.Network,
-                    UseDefaultCredentials = false,
+                    UseDefaultCredentials = true,
                     Host = "smtp.gmail.com",
                     EnableSsl = true,
                     Credentials = credentials
                 };
                 // Send it...         
                 client.Send(mail);
+                Console.WriteLine($"Email for {obj.FullName} successfully sent to ");
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error in sending email: " + ex.Message);
             }
-            Console.WriteLine($"Email for {obj.FullName} successfully sent to ");
+            
             // Console.ReadKey();
         }
     }

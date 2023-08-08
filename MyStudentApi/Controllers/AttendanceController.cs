@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyStudentApi.Data;
 using MyStudentApi.Models;
+using MailKit;
+using MyStudentApi.Repository.IRepo;
 
 namespace MyStudentApi.Controllers
 {
@@ -17,10 +19,12 @@ namespace MyStudentApi.Controllers
     public class AttendanceController : ControllerBase
     {
         private readonly TendancyDbContext _context;
+        private readonly IEMailServices _mailService;
 
-        public AttendanceController(TendancyDbContext context)
+        public AttendanceController(TendancyDbContext context, IEMailServices mailService)
         {
             _context = context;
+            _mailService = mailService;
         }
 
         // GET: api/Attendance
@@ -174,11 +178,10 @@ namespace MyStudentApi.Controllers
                     foreach (var x in studentsAbsentToday)
                     {
              
-                        Console.WriteLine($"{x.FullName} is absent for the current lecture.");
-
-                        EmailSender.Sender(x,currentLecture);
-                        
-                     }
+                        Console.WriteLine($" {x.FullName} is absent for the current lecture.");
+                        _mailService.SendEmail(x,currentLecture);
+                        Console.WriteLine($" Email for {x.FullName} Sent .");
+                    }
 
                 }
                 else

@@ -17,28 +17,14 @@ namespace MyStudentApi.Data
         public DbSet<StudentSchoolClass> StudentSchoolClass { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Student>()
+         modelBuilder.Entity<Student>()
          .HasMany(s => s.SchoolClasses)
          .WithMany(c => c.Students)
          .UsingEntity<StudentSchoolClass>(
              j => j.HasOne(ssc => ssc.SchoolClass).WithMany(),
              j => j.HasOne(ssc => ssc.Student).WithMany(),
-              j => j.ToTable("StudentSchoolClass")
+             j => j.ToTable("StudentSchoolClass")
          );
-
-            
-
-
-            /* protected override void OnModelCreating(ModelBuilder modelBuilder)
-             {
-                 base.OnModelCreating(modelBuilder);
-
-                 modelBuilder.Entity<Student>()
-                   .HasOne(s => s.SchoolClass)
-                   .WithMany(sc => sc.Students)
-                   .HasForeignKey(s => s.SchoolClassId)
-                   .OnDelete(DeleteBehavior.NoAction);
-             }*/
         }
     }
 }
