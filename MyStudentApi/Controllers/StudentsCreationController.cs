@@ -37,27 +37,31 @@ namespace MyStudentApi.Controllers
         }
 
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Student>> GetStudent(int id)
+        [HttpGet("{regNo}")]
+        public async Task<ActionResult<Student>> GetStudent(string regNo) 
         {
             if (_context.Students == null)
             {
                 return NotFound();
             }
-            var student = await _context.Students.FindAsync(id);
-
-            if (student == null)
+            if(StudentExists(regNo))
             {
-                return NotFound();
+                var student = await _context.Students.FirstOrDefaultAsync(x => x.RegNo == regNo);
+                return student;
             }
+            else
+            {
+                return NotFound("Reg Number Not In DataBase");
+            }
+ 
 
-            return student;
+ 
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutStudent(int id, Student student)
+        [HttpPut("{regNo}")]
+        public async Task<IActionResult> PutStudent(string regNo, Student student)
         {
-            if (id != student.Id)
+            if (regNo != student.RegNo)
             {
                 return BadRequest();
             }
@@ -70,7 +74,7 @@ namespace MyStudentApi.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!StudentExists(id))
+                if (!StudentExists(regNo))
                 {
                     return NotFound();
                 }
@@ -83,10 +87,7 @@ namespace MyStudentApi.Controllers
             return NoContent();
         }
 
-        /*        COMPLETED
-        */
-
-
+       
         [HttpPost]
         public IActionResult PostStudents(StudentsDTO studentDTO)
         {
@@ -95,9 +96,7 @@ namespace MyStudentApi.Controllers
             // Retrieve the classes with the given classIds from the database
        
 
-            var classesToAdd = _context.SchoolClasses
-                    .Where(c => student.CourseCodes.Contains(c.CourseCode))
-                    .ToList();
+            var classesToAdd = _context.SchoolClasses.Where(c => student.CourseCodes.Contains(c.CourseCode)).ToList();
             if(classesToAdd.Count > 0)
             {
                 var copyOfClassesToAdd = new List<SchoolClass>(classesToAdd);
@@ -111,6 +110,7 @@ namespace MyStudentApi.Controllers
         }
 
 
+        // DELETE BY ID
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStudent(int id)
         {
@@ -123,16 +123,15 @@ namespace MyStudentApi.Controllers
             {
                 return NotFound();
             }
-
             _context.Students.Remove(student);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool StudentExists(int id)
+        private bool StudentExists(string regNo)
         {
-            return (_context.Students?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Students?.Any(e => e.RegNo == regNo)).GetValueOrDefault();
         }
     }
 }

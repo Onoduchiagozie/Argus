@@ -20,24 +20,29 @@ public class MailServices : IEMailServices
         var smtpClient = new SmtpClient("smtp.gmail.com")
         {
             Port = 587,
-            Credentials = new NetworkCredential("valentine.onodu.247160@unn.edu.ng", "Killer_queen1"),
+            Credentials = new NetworkCredential(AdminDetails.Email,AdminDetails.Password),
         };
 
         try
         {
             smtpClient.EnableSsl = true;
-            smtpClient.Send("valentine.onodu.247160@unn.edu.ng", student.Email, "Absent Student", $"Y From Trusted Child Teacher .your Child {student.FullName} was not present for their {schoolClass.ClasssName}");
+            smtpClient.Send("valentine.onodu.247160@unn.edu.ng", student.Email,
+                                                                "Absent Student",
+                                                                $"Y From Trusted Child Teacher .your Child {student.FullName} was not present for their {schoolClass.ClasssName}");
             Console.WriteLine("Success");
+            Console.WriteLine($" Email for {student.FullName} Sent .");
+
             return true;
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.ToString());
+            Console.WriteLine("Failure");
             return false;
         }
     }
 
-  
+
 }
 
 
@@ -50,4 +55,4 @@ public class MailServices : IEMailServices
 
 
 
-
+ 

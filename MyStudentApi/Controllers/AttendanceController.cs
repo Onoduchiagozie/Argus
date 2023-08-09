@@ -29,88 +29,29 @@ namespace MyStudentApi.Controllers
 
         // GET: api/Attendance
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Student>>> GetAttendanceViewModel()
+        public async Task<ActionResult<IEnumerable<AttendanceViewModel>>> GetAttendanceViewModel()
         {
-            if (_context.AttendanceViewModel == null)
-            {
-                return NotFound();
-            }
-            var today = DateTime.Now;
-            var currentLecture = _context.SchoolClasses.FirstOrDefault(lecture =>
-                                                                            (lecture.DayOfWeek == today.DayOfWeek)
-                                                                             &&
-                                                                            (lecture.StartTime.TimeOfDay <= today.TimeOfDay
-                                                                             &&
-                                                                             lecture.StopTime.TimeOfDay >= today.TimeOfDay));
-            var studentsForClass = _context.Students
-                                         .Where(s =>
-                                         s.AttendanceViewModel
-                                         .Any(cs => cs.SchoolClass.ClasssName == currentLecture.ClasssName))
-                                         .ToList();
-            var todaysClassAttendance = _context.AttendanceViewModel.Where(
-                                             av => av.StartTime == currentLecture.StartTime && av.StopTime == currentLecture.StopTime)
-                                                 .Include(av => av.Student)
-                                                 .Include(av => av.SchoolClass)
-                                                 .ToList();
-
-
-            var mystudentsNotPresentToday = studentsForClass.Except(todaysClassAttendance.Select(av => av.Student)).ToList();
-
-            var studentsNotPresentToday = studentsForClass.Where(student => !todaysClassAttendance.Any(av => av.StudentId == student.Id)).ToList();
-            return  mystudentsNotPresentToday;
+            var box= await _context.AttendanceViewModel.ToListAsync();
+            return box;
         }
 
         // GET: api/Attendance/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<AttendanceViewModel>> GetAttendanceViewModel(int id)
+        [HttpGet("{courseCode}")]
+        public async Task<IList<AttendanceViewModel>> GetAttendanceViewModel(int courseCode)
         {
-            if (_context.AttendanceViewModel == null)
+        
+            if(courseCode != null)
             {
-                return NotFound();
+                var attendanceViewModel = _context.AttendanceViewModel.Where(x => x.SchoolClass.CourseCode == courseCode).ToListAsync();
+                return (IList<AttendanceViewModel>)attendanceViewModel;
             }
-            var attendanceViewModel = await _context.AttendanceViewModel.FindAsync(id);
-
-            if (attendanceViewModel == null)
+            else
             {
-                return NotFound();
+                return (IList<AttendanceViewModel>)NotFound();
             }
-
-            return attendanceViewModel;
+                      
         }
-
-        // PUT: api/Attendance/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutAttendanceViewModel(int id, AttendanceViewModel attendanceViewModel)
-        {
-            if (id != attendanceViewModel.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(attendanceViewModel).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!AttendanceViewModelExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Attendance
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+         
         [HttpPost]
         public async Task<ActionResult<int>> PostAttendanceViewModel(string studentRegNo)
         {
@@ -180,16 +121,10 @@ namespace MyStudentApi.Controllers
              
                         Console.WriteLine($" {x.FullName} is absent for the current lecture.");
                         _mailService.SendEmail(x,currentLecture);
-                        Console.WriteLine($" Email for {x.FullName} Sent .");
                     }
 
                 }
-                else
-                {
-                     
- 
-                     // There is no ongoing class at the current time, you can handle this scenario accordingly
-                }
+         
 
 
             }
@@ -213,20 +148,19 @@ namespace MyStudentApi.Controllers
         }
 
         // DELETE: api/Attendance/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAttendanceViewModel(int id)
+        [HttpDelete("{CourseCode}")]
+        public async Task<IActionResult> DeleteAttendanceViewModel(int CourseCode)
         {
             if (_context.AttendanceViewModel == null)
             {
                 return NotFound();
             }
-            var attendanceViewModel = await _context.AttendanceViewModel.FindAsync(id);
+            var attendanceViewModel = _context.AttendanceViewModel.Where(x => x.SchoolClass.CourseCode == CourseCode);
             if (attendanceViewModel == null)
             {
-                return NotFound();
+                return NotFound("Issue with getting Attendance Range Or Something");
             }
-
-            _context.AttendanceViewModel.Remove(attendanceViewModel);
+            _context.AttendanceViewModel.RemoveRange(attendanceViewModel);
             await _context.SaveChangesAsync();
 
             return NoContent();

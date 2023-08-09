@@ -37,27 +37,28 @@ namespace MyStudentApi.Controllers
         }
 
         // GET: api/Lectureres/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<SchoolClass>> GetSchoolClass(int id)
+        [HttpGet("{courseCode}")]
+        public async Task<ActionResult<SchoolClass>> GetSchoolClass(int courseCode)
         {
           if (_context.SchoolClasses == null)
           {
               return NotFound();
           }
-            var schoolClass = await _context.SchoolClasses.FindAsync(id);
-
-            if (schoolClass == null)
-            {
-                return NotFound();
+             if(SchoolClassExists(courseCode))
+                {
+                  var schoolClass = await _context.SchoolClasses.FirstOrDefaultAsync(x => x.CourseCode == courseCode);
+                  return schoolClass;
             }
-
-            return schoolClass;
+            else
+            {
+                return NotFound("Course Does Not Exist In Our Database");
+            }
         }
          
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutSchoolClass(int id, SchoolClass schoolClass)
+        [HttpPut("{coursecode}")]
+        public async Task<IActionResult> PutSchoolClass(int coursecode, SchoolClass schoolClass)
         {
-            if (id != schoolClass.Id)
+            if (coursecode != schoolClass.CourseCode)
             {
                 return BadRequest();
             }
@@ -70,9 +71,9 @@ namespace MyStudentApi.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!SchoolClassExists(id))
+                if (!SchoolClassExists(coursecode))
                 {
-                    return NotFound();
+                    return NotFound("Error at Put Request, Verify CourseCode Exists");
                 }
                 else
                 {
@@ -84,43 +85,46 @@ namespace MyStudentApi.Controllers
         }
          
         
-/*        COMPLETED
-*/        [HttpPost]
+        [HttpPost]
         public async Task<ActionResult<SchoolClassDTO>> PostSchoolClass(SchoolClassDTO schoolClass)
         {
           if (_context.SchoolClasses == null)
                 return Problem("Entity set 'SchoolClasses' is null.");
-          var realSchoolClass=_mapper.Map<SchoolClass>(schoolClass);
+            var realSchoolClass=_mapper.Map<SchoolClass>(schoolClass);
             
             _context.SchoolClasses.Add(realSchoolClass);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetSchoolClass", new { id = schoolClass.Id }, schoolClass);
+            return Ok(realSchoolClass);
         }
 
         
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSchoolClass(int id)
+        [HttpDelete("{CourseCode}")]
+        public async Task<IActionResult> DeleteSchoolClass(int CourseCode)
         {
             if (_context.SchoolClasses == null)
             {
                 return NotFound();
             }
-            var schoolClass = await _context.SchoolClasses.FindAsync(id);
-            if (schoolClass == null)
+            if (SchoolClassExists(CourseCode))
             {
-                return NotFound();
+                var schoolClass = await _context.SchoolClasses.FirstOrDefaultAsync(x => x.CourseCode == CourseCode);
+                _context.SchoolClasses.Remove(schoolClass);
+                await _context.SaveChangesAsync();
+                return NoContent();
             }
+            else
+            {
+                return NotFound("Request Couse Does Not ExIST Check YAh CourseCode");
+            }
+        
 
-            _context.SchoolClasses.Remove(schoolClass);
-            await _context.SaveChangesAsync();
 
-            return NoContent();
         }
 
-        private bool SchoolClassExists(int id)
+        private bool SchoolClassExists(int CourseCode)
         {
-            return (_context.SchoolClasses?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.SchoolClasses?.Any(e => e.CourseCode == CourseCode)).GetValueOrDefault();
         }
     }
 }
