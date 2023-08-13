@@ -19,5 +19,10 @@ namespace MyStudentApi.Models
         public DateTime? StartTime { get; set; }
         public DateTime DateTime { get; set; } = DateTime.Now;
         public bool IsRegistered { get; set; }
+
+        public static explicit operator AttendanceViewModel(List<AttendanceViewModel> v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

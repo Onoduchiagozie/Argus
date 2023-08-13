@@ -1,0 +1,70 @@
+﻿@page "/attendance-by-course"
+@using MyStudentApi.Models;
+@using System.Globalization;
+
+@inject ILecturesRepo _lecture
+@inject IStudent _student;
+<h3>Select Attendance Date</h3>
+
+<div class="form-group">
+    <label for="courseCode">Course Code</label>
+    <select id="courseCode" class="form-control" @bind="selectedCourseCode">
+        <option value="">Select a Course Code</option>
+        @foreach (var courseCode in availableCourseCodes)
+        {
+            <option value="@courseCode">@courseCode</option>
+        }
+    </select>
+</div>
+
+<h4>Attendance for Course Code: @selectedCourseCode</h4>
+<button class="btn btn-primary" @onclick="LoadAttendanceData">Request</button>
+<table>
+    <thead>
+        <tr style="padding: 10px 15px;">
+            <th>Student</th>
+            <th>Signed In</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var attendance in attendanceData)
+        {
+            var student = students.FirstOrDefault(s => s.Id == attendance.StudentId);
+            var studentName = student != null ? student.FullName : "Unknown";
+
+            <tr>
+                <td>@studentName</td>
+                <td>@attendance.StartTime.ToString()</td>
+                
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<int> availableCourseCodes = new List<int>(); // Replace with actual course codes
+    private int selectedCourseCode;
+    private List<AttendanceViewModel> attendanceData = new List<AttendanceViewModel>();
+
+    private IEnumerable<Student> students = new List<Student>();
+
+
+    private async Task LoadAttendanceData()
+    {
+        if (selectedCourseCode != 0)
+        {
+            attendanceData = await _lecture.BringLecturesAttendance(selectedCourseCode);
+        }
+        else
+        {
+            attendanceData.Clear();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var madeclasses = await _lecture.Getlectures();
+        students = await _student.GetAllStudentsc();
+        availableCourseCodes = madeclasses.Select(schoolClass => schoolClass.CourseCode).ToList();
+    }
+}

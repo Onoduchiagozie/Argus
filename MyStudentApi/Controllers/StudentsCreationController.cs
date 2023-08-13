@@ -8,6 +8,7 @@ using NuGet.Packaging;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using MyStudentApi.Repository.IRepo;
 
 namespace MyStudentApi.Controllers
 {
@@ -18,11 +19,14 @@ namespace MyStudentApi.Controllers
         private readonly TendancyDbContext _context;
 
         private readonly IMapper _mapper;
+        private readonly IStudent _student;
 
-        public StudentsCreationController(TendancyDbContext context, IMapper mapper)
+        public StudentsCreationController(TendancyDbContext context, IMapper mapper,IStudent student)
         {
             _context = context;
             _mapper = mapper;
+            _student = student;
+
         }
 
         // GET: api/StudentsCreation
@@ -92,21 +96,8 @@ namespace MyStudentApi.Controllers
         public IActionResult PostStudents(StudentsDTO studentDTO)
         {
             var student = _mapper.Map<Student>(studentDTO);
-  
-            // Retrieve the classes with the given classIds from the database
-       
-
-            var classesToAdd = _context.SchoolClasses.Where(c => student.CourseCodes.Contains(c.CourseCode)).ToList();
-            if(classesToAdd.Count > 0)
-            {
-                var copyOfClassesToAdd = new List<SchoolClass>(classesToAdd);
-                student.SchoolClasses.AddRange(copyOfClassesToAdd);
-            }
-        
-            _context.Students.Add(student);          
-
-            _context.SaveChanges();
-            return Ok();
+            var box = _student.CreateStudents(student);
+            return Ok(box);
         }
 
 

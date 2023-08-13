@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using MyStudentApi.Data;
 using MyStudentApi.Models;
 using MyStudentApi.Models.DTO;
+using MyStudentApi.Repository.IRepo;
 
 namespace MyStudentApi.Controllers
 {
@@ -18,11 +21,14 @@ namespace MyStudentApi.Controllers
     {
         private readonly TendancyDbContext _context;
         private readonly IMapper _mapper;
+        private readonly ILecturesRepo _lecturesRepo;
 
-        public CreateLecturesController(TendancyDbContext context,IMapper mapper)
+        public CreateLecturesController(TendancyDbContext context,IMapper mapper, ILecturesRepo lecturesRepo)
         {
             _context = context;
             _mapper = mapper;
+            _lecturesRepo = lecturesRepo;
+
         }
 
         // GET: api/Lectureres
@@ -36,18 +42,21 @@ namespace MyStudentApi.Controllers
             return await _context.SchoolClasses.ToListAsync();
         }
 
-        // GET: api/Lectureres/5
+        // GET: Class With Kids That Registered For It
         [HttpGet("{courseCode}")]
         public async Task<ActionResult<SchoolClass>> GetSchoolClass(int courseCode)
-        {
-          if (_context.SchoolClasses == null)
-          {
-              return NotFound();
-          }
+        { 
+         
              if(SchoolClassExists(courseCode))
                 {
-                  var schoolClass = await _context.SchoolClasses.FirstOrDefaultAsync(x => x.CourseCode == courseCode);
-                  return schoolClass;
+                 var schoolClass = await _context.SchoolClasses.Include(c=>c.Students).FirstOrDefaultAsync(x => x.CourseCode == courseCode);
+                var options = new JsonSerializerOptions
+                {
+                    ReferenceHandler = ReferenceHandler.Preserve,
+                };
+
+                var json = JsonSerializer.Serialize(schoolClass, options);
+                return Content(json, "application/json");
             }
             else
             {
@@ -88,14 +97,9 @@ namespace MyStudentApi.Controllers
         [HttpPost]
         public async Task<ActionResult<SchoolClassDTO>> PostSchoolClass(SchoolClassDTO schoolClass)
         {
-          if (_context.SchoolClasses == null)
-                return Problem("Entity set 'SchoolClasses' is null.");
-            var realSchoolClass=_mapper.Map<SchoolClass>(schoolClass);
-            
-            _context.SchoolClasses.Add(realSchoolClass);
-            await _context.SaveChangesAsync();
-
-            return Ok(realSchoolClass);
+            var realSchoolClass = _mapper.Map<SchoolClass>(schoolClass);
+            var box = await _lecturesRepo.CreateLectures(realSchoolClass);
+            return Ok(box);
         }
 
         

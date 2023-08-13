@@ -1,0 +1,49 @@
+﻿@page "/registerstudent"
+@inject IStudent _student;
+@inject ILecturesRepo _lecture;
+@inject NavigationManager navi;
+
+<h3>Add Student</h3>
+
+<div class="form-group">
+    <label for="regNo">RegNo</label>
+    <input type="text" id="regNo" class="form-control" @bind="newStudent.RegNo" />
+</div>
+<div class="form-group">
+    <label for="fullName">Full Name</label>
+    <input type="text" id="fullName" class="form-control" @bind="newStudent.FullName" />
+</div>
+<div class="form-group">
+    <label for="email">Email</label>
+    <input type="email" id="email" class="form-control" @bind="newStudent.Email" />
+</div>
+<div class="form-group">
+    <label for="courseCodes">Course Codes (comma-separated)</label>
+    <input type="text" id="courseCodes" class="form-control" @bind="courseCodesInput" />
+</div>
+
+<button class="btn btn-primary" @onclick="AddStudent">Add Student</button>
+
+@code {
+    @using MyStudentApi.Models
+    @using MyStudentApi.Models.DTO;
+    @using MyStudentApi.Repository.IRepo;
+    public Student newStudent { get; set; } = new Student();
+    private string courseCodesInput;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var madeclasses = await _lecture.Getlectures();
+    }
+
+    private void AddStudent()
+    {
+        if (!string.IsNullOrEmpty(courseCodesInput))
+        {
+            newStudent.CourseCodes = courseCodesInput.Split(',').Select(int.Parse).ToArray();
+            _student.CreateStudents(newStudent);
+            courseCodesInput = string.Empty;
+            navi.NavigateTo("/studentsbycourse");
+        }
+    }
+}

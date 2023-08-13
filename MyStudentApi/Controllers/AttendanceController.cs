@@ -19,13 +19,15 @@ namespace MyStudentApi.Controllers
     public class AttendanceController : ControllerBase
     {
         private readonly TendancyDbContext _context;
+        private IAttendanceRepo _attendanceRepo;
         private readonly IEMailServices _mailService;
-
-        public AttendanceController(TendancyDbContext context, IEMailServices mailService)
+ 
+        public AttendanceController(TendancyDbContext context, IEMailServices mailService, IAttendanceRepo attendanceRepo)
         {
             _context = context;
             _mailService = mailService;
-        }
+            _attendanceRepo = attendanceRepo;
+         }
 
         // GET: api/Attendance
         [HttpGet]
@@ -37,114 +39,23 @@ namespace MyStudentApi.Controllers
 
         // GET: api/Attendance/5
         [HttpGet("{courseCode}")]
-        public async Task<IList<AttendanceViewModel>> GetAttendanceViewModel(int courseCode)
+        public async Task<ActionResult<AttendanceViewModel>> GetAttendanceViewModel(int courseCode)
         {
-        
-            if(courseCode != null)
-            {
-                var attendanceViewModel = _context.AttendanceViewModel.Where(x => x.SchoolClass.CourseCode == courseCode).ToListAsync();
-                return (IList<AttendanceViewModel>)attendanceViewModel;
-            }
-            else
-            {
-                return (IList<AttendanceViewModel>)NotFound();
-            }
-                      
-        }
+
+            //      var attendanceViewModel =await _attendanceRepo.GetAttendanceViewModel(courseCode);
+            var attendanceViewModel = _context.AttendanceViewModel.Where(x => x.SchoolClass.CourseCode == courseCode);
+
          
+
+
+            return Ok(attendanceViewModel);
+        }
+
         [HttpPost]
         public async Task<ActionResult<int>> PostAttendanceViewModel(string studentRegNo)
         {
-            if (_context.AttendanceViewModel == null)
-            {
-                return Problem("Entity set 'TendancyDbContext.AttendanceViewModel'  is null.");
-            }
-
-            var student = _context.Students.FirstOrDefault(c => c.RegNo == studentRegNo);
-
-            var today = DateTime.Now;
-            var currentLecture = _context.SchoolClasses.FirstOrDefault(lecture =>
-                                                                            (lecture.DayOfWeek == today.DayOfWeek) 
-                                                                             &&
-                                                                            (lecture.StartTime.TimeOfDay.Hours <= today.TimeOfDay.Hours
-                                                                             &&
-                                                                             lecture.StopTime.TimeOfDay.Hours >= today.TimeOfDay.Hours));
-
-            var tendate = new AttendanceViewModel
-            {
-                Student = student,                  
-            };
-            if (currentLecture != null)
-            {
-                var meth= (currentLecture != null) ? currentLecture : null;
-                tendate.SchoolClass = meth;
-                tendate.IsRegistered = true;
-                tendate.StartTime = currentLecture.StartTime;
-                tendate.StopTime = currentLecture.StopTime;
-                tendate.Course = currentLecture.ClasssName;
-            }
-            else
-            {
-                tendate.SchoolClassId= null;
-                tendate.IsRegistered = false;
-            }
-            _context.AttendanceViewModel.Add(tendate);
-            await _context.SaveChangesAsync();
-
-            if (currentLecture != null)
-            {
-                DateTime fiveMinutesBeforeEndTime = currentLecture.StopTime.AddMinutes(-5);
-
-                if (true) //today >= fiveMinutesBeforeEndTime)
-                {
- 
-
-                    // Retrieve the list of students who are registered for the current lecture
-                    var studentsForClass = _context.Students.Where(s => s.SchoolClasses.Any(sc => sc.Id == currentLecture.Id))
-                                                                 .ToList();
-                    // Retrieve the list of attendance records for the current lecture
-
-                    var todaysClassAttendance = _context.AttendanceViewModel
-                              .Where(av => av.StartTime == currentLecture.StartTime && av.StopTime == currentLecture.StopTime)
-                              .Include(av => av.Student)
-                              .ToList();
-
-                    // Find the students who are registered but have no corresponding attendance record
-                    var studentsAbsentToday = studentsForClass
-                        .Where(student => !todaysClassAttendance.Any(av => av.StudentId == student.Id))
-                        .ToList();
-
-
-                    // Now you have the list of students who are registered but are absent for the current lecture
-                    foreach (var x in studentsAbsentToday)
-                    {
-             
-                        Console.WriteLine($" {x.FullName} is absent for the current lecture.");
-                        _mailService.SendEmail(x,currentLecture);
-                    }
-
-                }
-         
-
-
-            }
-            // Check if the current lecture exists
- 
-
-          
-
-
-
-
-            var options = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve,
-                // Other serialization options if needed
-            };
-
-            string jsonString = JsonSerializer.Serialize(tendate, options);
-
-            return Ok(jsonString);
+            var box =await _attendanceRepo.PostAttendanceViewModel(studentRegNo);  
+            return Ok(box);
         }
 
         // DELETE: api/Attendance/5

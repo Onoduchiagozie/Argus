@@ -1,0 +1,60 @@
+﻿@page "/addclass"
+@inject ILecturesRepo _lecture;
+@inject NavigationManager navi;
+
+<h3>Add Class</h3>
+
+<div class="form-group">
+    <label for="courseCode">Course Code</label>
+    <input type="number" id="courseCode" class="form-control" @bind="newClass.CourseCode" />
+</div>
+<div class="form-group">
+    <label for="className">Class Name</label>
+    <input type="text" id="className" class="form-control" @bind="newClass.ClasssName" />
+</div>
+<div class="form-group">
+    <label for="teacherName">Teacher Name</label>
+    <input type="text" id="teacherName" class="form-control" @bind="newClass.TeacherName" />
+</div>
+<div class="form-group">
+    <label for="stopTime">Day Of Week</label>
+    <input type="number" id="dayofweek" class="form-control" @bind="newClass.DayOfWeek" />
+</div>
+<div class="form-group">
+    <label for="startTime">Start Time</label>
+    <input type="time" id="startTime" class="form-control" @bind="newClass.StartTime" />
+</div>
+<div class="form-group">
+    <label for="stopTime">Stop Time</label>
+    <input type="time" id="stopTime" class="form-control" @bind="newClass.StopTime" />
+</div>
+<div class="form-group">
+    <label for="stopTime">Unit Load</label>
+    <input type="number" id="unitload" class="form-control" @bind="newClass.UnitLoad" />
+</div>
+<!-- Add more form fields for other properties -->
+
+<button class="btn btn-primary" @onclick="AddClass">Add Class</button>
+
+@code {
+    @using MyStudentApi.Models
+    @using MyStudentApi.Models.DTO;
+    @using MyStudentApi.Repository.IRepo;
+    public SchoolClass newClass { get; set; } = new SchoolClass();
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        newClass.StopTime = DateTime.Now;
+        newClass.StartTime = DateTime.Now;
+    }
+
+    private void AddClass()
+    {
+        _lecture.CreateLectures(newClass);
+        navi.NavigateTo("/classlist");     
+       
+
+    }
+}

@@ -13,13 +13,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<TendancyDbContext>(options => options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IAttendanceRepo, AttendanceRepo>();
+builder.Services.AddScoped<IStudent, StudentRepo>();
+builder.Services.AddScoped<ILecturesRepo, LecturesRepo>();
+builder.Services.AddTransient<IEMailServices, MailServices>();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 
 
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
-builder.Services.AddTransient<IEMailServices, MailServices>();
+
 
 
 

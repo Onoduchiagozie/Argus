@@ -1,0 +1,57 @@
+﻿@page "/studentsbycourse"
+@inject IStudent _student;
+@inject ILecturesRepo _lecture;
+@inject NavigationManager navi;
+
+<h3>Students by Course</h3>
+
+<div class="form-group">
+    <label for="courseCode">Select Course Code</label>
+    <select id="courseCode" class="form-control" @bind="selectedCourseCode">
+        <option value="">-- Select Course Code --</option>
+        @foreach (var courseCode in availableCourseCodes)
+        {
+            <option value="@courseCode">@courseCode</option>
+        }
+    </select>
+</div>
+
+<button class="btn btn-primary" @onclick="LoadStudents">Load Students</button>
+
+@if (students != null)
+{
+    <h4>Students registered for Course @selectedCourseCode:</h4>
+    <ul>
+        @foreach (var student in students)
+        {
+            <li>Name @student.FullName, Email: @student.Email</li>
+        }
+    </ul>
+}
+
+@code {
+    @using MyStudentApi.Models
+    @using MyStudentApi.Models.DTO;
+    @using MyStudentApi.Repository.IRepo;
+    public List<int> availableCourseCodes = new List<int>();
+    private int selectedCourseCode;
+    private IEnumerable<Student> students;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var madeclasses = await _lecture.Getlectures();
+        availableCourseCodes = madeclasses.Select(schoolClass => schoolClass.CourseCode).ToList();
+    }
+
+    private async Task LoadStudents()
+    {
+        if (selectedCourseCode != 0)
+        {
+            students = await _student.GetSchoolClassAsync(selectedCourseCode);
+        }
+        else
+        {
+            students = null;
+        }
+    }
+}

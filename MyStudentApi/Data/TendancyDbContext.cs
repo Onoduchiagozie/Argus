@@ -15,6 +15,7 @@ namespace MyStudentApi.Data
         public DbSet<SchoolClass> SchoolClasses { get; set; }
         public DbSet<AttendanceViewModel> AttendanceViewModel { get; set; }
         public DbSet<StudentSchoolClass> StudentSchoolClass { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
          modelBuilder.Entity<Student>()
@@ -25,6 +26,10 @@ namespace MyStudentApi.Data
              j => j.HasOne(ssc => ssc.Student).WithMany(),
              j => j.ToTable("StudentSchoolClass")
          );
+            modelBuilder.Entity<Student>()
+                    .Property(s => s.Id)  // Assuming 'Id' is the primary key property
+                    .ValueGeneratedOnAdd();  // This configures it as an identity column
+
         }
     }
 }
