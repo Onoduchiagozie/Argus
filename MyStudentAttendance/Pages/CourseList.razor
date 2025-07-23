@@ -1,4 +1,5 @@
 ﻿@page "/studentsbycourse"
+@using MyStudentApi.Models
 @inject IStudent _student;
 @inject ILecturesRepo _lecture;
 @inject NavigationManager navi;
@@ -28,11 +29,11 @@
         }
     </ul>
 }
-
-@code {
-    @using MyStudentApi.Models
+@using MyStudentApi.Models
     @using MyStudentApi.Models.DTO;
-    @using MyStudentApi.Repository.IRepo;
+@using MyStudentApi.Repository.IRepo;
+@code {
+
     public List<int> availableCourseCodes = new List<int>();
     private int selectedCourseCode;
     private IEnumerable<Student> students;

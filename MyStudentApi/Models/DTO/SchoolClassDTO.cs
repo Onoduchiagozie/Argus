@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyStudentApi.Models.DTO
 {
@@ -11,7 +12,9 @@ namespace MyStudentApi.Models.DTO
         public DateTime StopTime { get; set; }
         public int CourseCode { get; set; }
         public int UnitLoad { get; set; }
+        [Required]
         public DayOfWeek? DayOfWeek { get; set; }
+        
 /*        public List<int> CourseCodes { get; set; }
 */
     }

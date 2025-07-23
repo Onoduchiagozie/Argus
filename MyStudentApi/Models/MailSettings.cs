@@ -1,4 +1,4 @@
-﻿namespace MyStudentApi.Data
+﻿namespace MyStudentApi.Models
 {
     public class MailSettings
     {

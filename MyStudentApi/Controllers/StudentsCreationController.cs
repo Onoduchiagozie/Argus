@@ -16,7 +16,7 @@ namespace MyStudentApi.Controllers
     [ApiController]
     public class StudentsCreationController : ControllerBase
     {
-        private readonly TendancyDbContext _context;
+       // private readonly TendancyDbContext _context;
 
         private readonly IMapper _mapper;
         private readonly IStudent _student;

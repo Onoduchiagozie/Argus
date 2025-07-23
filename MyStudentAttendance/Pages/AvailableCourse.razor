@@ -1,0 +1,63 @@
+﻿@page "/classlist"
+@inject ILectureServices _lecture;
+@using System.Globalization;
+@using MyStudentApi.Models
+<PageTitle>Available Subjects</PageTitle>
+
+@using MyStudentAttendance.Data
+@inject WeatherForecastService ForecastService
+
+<h1>Available Subject</h1>
+
+<p>Submitted Lecture Info</p>
+
+@if (forecasts != null)
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Class Name</th>
+            <th>Course Code</th>
+            <th>Teacher</th>
+            <th>Day</th>
+            <th>Start Time</th>
+            <th>Stop Time</th>
+                
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var forecast in forecasts)
+        {
+            <tr>
+                <td>@forecast.ClasssName</td>
+                <td>COS @forecast.CourseCode</td>
+                <td>@forecast.TeacherName</td>
+                <td>@forecast.DayOfWeek</td>
+                <td>@forecast.StartTime.ToString("hh:mm tt", CultureInfo.InvariantCulture)</td>
+                <td>@forecast.StopTime.ToString("hh:mm tt", CultureInfo.InvariantCulture)</td>
+    
+            </tr>
+        }
+        </tbody>
+    </table> }
+else
+{
+    <p><em>Loading...</em></p>
+}
+@using MyStudentApi.Models.DTO
+@code {
+    public List<SchoolClassDTO> forecasts=new List<SchoolClassDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try{
+  
+            forecasts = await _lecture.GetAttendanceAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Service was disposed: " + ex.Message);
+        }   
+    }
+}
+

@@ -18,23 +18,23 @@ namespace MyStudentApi.Controllers
     [ApiController]
     public class AttendanceController : ControllerBase
     {
-        private readonly TendancyDbContext _context;
+      //  private readonly TendancyDbContext _context;
         private IAttendanceRepo _attendanceRepo;
         private readonly IEMailServices _mailService;
  
-        public AttendanceController(TendancyDbContext context, IEMailServices mailService, IAttendanceRepo attendanceRepo)
+        public AttendanceController( IEMailServices mailService, IAttendanceRepo attendanceRepo)
         {
-            _context = context;
+        //    _context = context;
             _mailService = mailService;
             _attendanceRepo = attendanceRepo;
          }
 
         // GET: api/Attendance
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AttendanceViewModel>>> GetAttendanceViewModel()
+        public async Task<List<AttendanceViewModel>> GetAttendanceViewModel()
         {
-            var box= await _context.AttendanceViewModel.ToListAsync();
-            return box;
+            var box = await _attendanceRepo.GetAllAttendance();
+                 return box;
         }
 
         // GET: api/Attendance/5
@@ -42,44 +42,29 @@ namespace MyStudentApi.Controllers
         public async Task<ActionResult<AttendanceViewModel>> GetAttendanceViewModel(int courseCode)
         {
 
-            //      var attendanceViewModel =await _attendanceRepo.GetAttendanceViewModel(courseCode);
-            var attendanceViewModel = _context.AttendanceViewModel.Where(x => x.SchoolClass.CourseCode == courseCode);
-
-         
-
-
-            return Ok(attendanceViewModel);
+             var attendanceViewModel = _attendanceRepo.GetAttendanceByCourseCode(courseCode);
+             return Ok(attendanceViewModel);
         }
 
         [HttpPost]
         public async Task<ActionResult<int>> PostAttendanceViewModel(string studentRegNo)
         {
-            var box =await _attendanceRepo.PostAttendanceViewModel(studentRegNo);  
+            var newVm=new AttendanceViewModel();
+            var box =await _attendanceRepo.PostAttendanceAsync(newVm);  
             return Ok(box);
         }
 
         // DELETE: api/Attendance/5
         [HttpDelete("{CourseCode}")]
-        public async Task<IActionResult> DeleteAttendanceViewModel(int CourseCode)
+        public async Task<IActionResult> DeleteAttendanceViewModel(Guid CourseCode)
         {
-            if (_context.AttendanceViewModel == null)
-            {
-                return NotFound();
-            }
-            var attendanceViewModel = _context.AttendanceViewModel.Where(x => x.SchoolClass.CourseCode == CourseCode);
-            if (attendanceViewModel == null)
-            {
-                return NotFound("Issue with getting Attendance Range Or Something");
-            }
-            _context.AttendanceViewModel.RemoveRange(attendanceViewModel);
-            await _context.SaveChangesAsync();
+
+
+           var box = await _attendanceRepo.DeleteAttendanceAsync(CourseCode);
 
             return NoContent();
         }
 
-        private bool AttendanceViewModelExists(int id)
-        {
-            return (_context.AttendanceViewModel?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+    
     }
 }

@@ -18,7 +18,7 @@ namespace MyStudentApi.Repository
 
     
 
-     async Task<List<AttendanceViewModel>> ILecturesRepo.BringLecturesAttendance(int coursecode)
+   public  async Task<List<AttendanceViewModel>> BringLecturesAttendance(int coursecode)
         {
             var attendanceViewModels = await _context.AttendanceViewModel
                             .Where(av => av.SchoolClass.CourseCode == coursecode)
@@ -27,7 +27,7 @@ namespace MyStudentApi.Repository
             return attendanceViewModels;
         }
 
-        async  Task<SchoolClass> ILecturesRepo.CreateLectures(SchoolClass realSchoolClass)
+     public   async  Task<SchoolClass> CreateLectures(SchoolClass realSchoolClass)
         {
                      
               await  _context.SchoolClasses.AddAsync(realSchoolClass);
@@ -37,7 +37,7 @@ namespace MyStudentApi.Repository
 
      
 
-      async  Task<List<SchoolClass>> ILecturesRepo.Getlectures()
+     public async  Task<List<SchoolClass>> Getlectures()
         {
             var box = await _context.SchoolClasses.ToListAsync<SchoolClass>();
              return box;

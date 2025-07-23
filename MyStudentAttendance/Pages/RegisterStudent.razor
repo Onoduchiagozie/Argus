@@ -24,10 +24,11 @@
 
 <button class="btn btn-primary" @onclick="AddStudent">Add Student</button>
 
+@using MyStudentApi.Models
+@using MyStudentApi.Models.DTO;
+@using MyStudentApi.Repository.IRepo;
 @code {
-    @using MyStudentApi.Models
-    @using MyStudentApi.Models.DTO;
-    @using MyStudentApi.Repository.IRepo;
+
     public Student newStudent { get; set; } = new Student();
     private string courseCodesInput;
 

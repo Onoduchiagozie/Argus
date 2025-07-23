@@ -8,16 +8,22 @@ using MyStudentAttendance.Data;
 using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
- builder.Services.AddTransient<ILecturesRepo, LecturesRepo>();
-builder.Services.AddTransient<IStudent,StudentRepo>();
- 
-builder.Services.AddDbContext<TendancyDbContext>(options =>
+builder.Services.AddScoped<ILecturesRepo, LecturesRepo>();
+
+builder.Services.AddScoped<ILectureServices, LectureServices>();
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
+
+ //builder.Services.AddAutoMapper(typeof(LectureServices));
+ //builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+
+builder.Services.AddDbContextFactory<TendancyDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+
 
 builder.Services.AddSingleton<WeatherForecastService>();
 

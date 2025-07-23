@@ -6,6 +6,7 @@ using MyStudentApi.Repository;
 using MyStudentApi.Repository.IRepo;
 using NETCore.MailKit.Core;
 using System.Configuration;
+using MyStudentApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +18,7 @@ builder.Services.AddDbContext<TendancyDbContext>(options => options.UseSqlServer
 builder.Services.AddScoped<IAttendanceRepo, AttendanceRepo>();
 builder.Services.AddScoped<IStudent, StudentRepo>();
 builder.Services.AddScoped<ILecturesRepo, LecturesRepo>();
-builder.Services.AddTransient<IEMailServices, MailServices>();
+builder.Services.AddScoped<IEMailServices, MailServices>();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 
@@ -31,14 +32,14 @@ builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailS
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My Attendance", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Argus", Version = "v1" });
  
 });
 
